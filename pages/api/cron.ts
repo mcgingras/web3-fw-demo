@@ -1,29 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getPendingTx } from "@/lib/upstash";
+import { getPendingTx, addPendingTx } from "@/lib/upstash";
 import { publicClient } from "@/lib/viem";
+import { TransactionNotFoundError, TransactionReceipt } from "viem";
 import { postData } from "@/lib/fetch";
 
 export default async function handler(
   _req: NextApiRequest,
   res: NextApiResponse
 ) {
+  let transaction;
   try {
-    const transaction = await getPendingTx();
-
+    transaction = await getPendingTx();
     if (transaction) {
-      // probably don't want to use the wait hook here either, since its blocking and could timeout the serverless fn
-      const transactionStatus = await publicClient.waitForTransactionReceipt({
+      const receipt = (await publicClient.getTransactionReceipt({
         hash: transaction.hash as `0x${string}`,
-      });
+      })) as TransactionReceipt;
 
-      console.log(transactionStatus);
-
-      // if tx is still pending, we want to push it back onto the queue.
-      // otherwise, we would never check it again
-
-      // maybe get api host from env?
-      await postData(`https://web3-fw-demo.vercel.app${transaction.endpoint}`, {
-        transaction,
+      await postData(`${process.env.API_HOST}${transaction.endpoint}`, {
+        receipt,
       });
 
       return res.json({ message: transaction });
@@ -32,10 +26,18 @@ export default async function handler(
     console.log("No transactions in queue.");
     return res.json({ message: "No transactions in queue." });
   } catch (err) {
+    if (err instanceof TransactionNotFoundError) {
+      if (transaction) {
+        await addPendingTx(transaction);
+      }
+      return res.json({
+        statusCode: 202,
+        message: "Transaction not yet confirmed on chain, pending result...",
+      });
+    }
+
     console.log("Cron job error:", err);
-    await console.error(
-      "Cron job error: \n" + "```" + JSON.stringify(err) + "```"
-    );
+    console.error("Cron job error: \n" + "```" + JSON.stringify(err) + "```");
     return res.json({ statusCode: 500, message: err });
   }
 }
