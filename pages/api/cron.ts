@@ -16,6 +16,8 @@ export default async function handler(
         hash: transaction.hash as `0x${string}`,
       })) as TransactionReceipt;
 
+      console.log(receipt);
+
       const fullEndpoint = `${process.env.API_HOST}${transaction.endpoint}`;
       await postData(fullEndpoint, {
         receipt,
