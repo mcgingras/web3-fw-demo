@@ -21,8 +21,7 @@ export default async function handler(
         receipt,
       });
 
-      console.log("env", process.env.API_HOST);
-      console.log("transaction is a success");
+      console.log("env", fullEndpoint);
       return res.json({ message: transaction });
     }
 
