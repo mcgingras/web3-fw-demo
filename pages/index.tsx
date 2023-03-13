@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { Profile } from "@/components/Profile";
+import { TxReceiptList } from "@/components/TxReceiptList";
 
 export default function Home() {
   return (
@@ -12,6 +13,8 @@ export default function Home() {
       </Head>
       <main className="max-w-[800px] mt-12 mx-auto">
         <Profile />
+        <h2 className="font-bold text-2xl mt-6 mb-2">Transaction recipts</h2>
+        <TxReceiptList />
       </main>
     </>
   );
