@@ -16,7 +16,8 @@ export default async function handler(
         hash: transaction.hash as `0x${string}`,
       })) as TransactionReceipt;
 
-      await postData(`https://web3-fw-demo.vercel.app${transaction.endpoint}`, {
+      const fullEndpoint = `${process.env.API_HOST}${transaction.endpoint}`;
+      await postData(fullEndpoint, {
         receipt,
       });
 
