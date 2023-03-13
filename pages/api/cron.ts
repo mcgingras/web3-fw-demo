@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getPendingTx } from "@/lib/upstash";
 import { publicClient } from "@/lib/viem";
+import { postData } from "@/lib/fetch";
 
 export default async function handler(
   _req: NextApiRequest,
@@ -8,13 +9,15 @@ export default async function handler(
 ) {
   try {
     const transaction = await getPendingTx();
-    console.log("transaction", transaction);
 
     // instead of automatically creating tx, we should wait the tx, and if success, call API
     if (transaction) {
       const transactionStatus = await publicClient.waitForTransactionReceipt({
         hash: transaction.hash as `0x${string}`,
       });
+
+      console.log(transactionStatus);
+      postData(transaction.endpoint, { transaction });
 
       // what happens if still pending?
 
