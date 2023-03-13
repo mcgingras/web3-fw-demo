@@ -10,16 +10,21 @@ export default async function handler(
   try {
     const transaction = await getPendingTx();
 
-    // instead of automatically creating tx, we should wait the tx, and if success, call API
     if (transaction) {
+      // probably don't want to use the wait hook here either, since its blocking and could timeout the serverless fn
       const transactionStatus = await publicClient.waitForTransactionReceipt({
         hash: transaction.hash as `0x${string}`,
       });
 
       console.log(transactionStatus);
-      postData(transaction.endpoint, { transaction });
 
-      // what happens if still pending?
+      // if tx is still pending, we want to push it back onto the queue.
+      // otherwise, we would never check it again
+
+      // maybe get api host from env?
+      await postData(`https://web3-fw-demo.vercel.app${transaction.endpoint}`, {
+        transaction,
+      });
 
       return res.json({ message: transaction });
     }
