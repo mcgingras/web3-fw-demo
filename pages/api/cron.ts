@@ -20,6 +20,7 @@ export default async function handler(
         receipt,
       });
 
+      console.log("transaction is a success");
       return res.json({ message: transaction });
     }
 
@@ -30,6 +31,8 @@ export default async function handler(
       if (transaction) {
         await addPendingTx(transaction);
       }
+
+      console.log("transaction not yet confirmed, pending result...");
       return res.json({
         statusCode: 202,
         message: "Transaction not yet confirmed on chain, pending result...",
