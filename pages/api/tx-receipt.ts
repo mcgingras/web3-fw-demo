@@ -6,7 +6,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { receipt } = req.body as { receipt: TransactionReceipt };
+  const { receipt } = req.body as {
+    receipt: Pick<TransactionReceipt, "transactionHash" | "status">;
+  };
   try {
     if (receipt.status === "success") {
       await db.txReceipt.create({

@@ -17,19 +17,12 @@ export default async function handler(
       })) as TransactionReceipt;
 
       const fullEndpoint = `${process.env.API_HOST}${transaction.endpoint}`;
-      // await postData(fullEndpoint, {
-      //   receipt,
-      // });
-
-      const c = await fetch(fullEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      await postData(fullEndpoint, {
+        receipt: {
+          status: receipt.status,
+          transactionHash: receipt.transactionHash,
         },
-        body: JSON.stringify({ receipt }),
       });
-      const d = c.json();
-      console.log(d);
 
       return res.json({ message: transaction });
     }
