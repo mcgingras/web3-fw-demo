@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getPendingTx, addPendingTx } from "@/lib/upstash";
 import { publicClient } from "@/lib/viem";
-import { TransactionNotFoundError, TransactionReceipt } from "viem";
+import { TransactionReceiptNotFoundError, TransactionReceipt } from "viem";
 import { postData } from "@/lib/fetch";
 
 export default async function handler(
@@ -30,7 +30,7 @@ export default async function handler(
     console.log("No transactions in queue.");
     return res.json({ message: "No transactions in queue." });
   } catch (err) {
-    if (err instanceof TransactionNotFoundError) {
+    if (err instanceof TransactionReceiptNotFoundError) {
       if (transaction) {
         await addPendingTx(transaction);
       }
