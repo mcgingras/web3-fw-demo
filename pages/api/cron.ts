@@ -16,14 +16,21 @@ export default async function handler(
         hash: transaction.hash as `0x${string}`,
       })) as TransactionReceipt;
 
-      console.log(receipt);
-
       const fullEndpoint = `${process.env.API_HOST}${transaction.endpoint}`;
-      await postData(fullEndpoint, {
-        receipt,
-      });
+      // await postData(fullEndpoint, {
+      //   receipt,
+      // });
 
-      console.log("env", fullEndpoint);
+      const c = await fetch(fullEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ receipt }),
+      });
+      const d = c.json();
+      console.log(d);
+
       return res.json({ message: transaction });
     }
 
