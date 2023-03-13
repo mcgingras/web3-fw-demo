@@ -29,6 +29,7 @@ export default async function handler(
       return res.json({ message: transaction });
     }
 
+    console.log("No transactions in queue.");
     return res.json({ message: "No transactions in queue." });
   } catch (err) {
     console.log("Cron job error:", err);
