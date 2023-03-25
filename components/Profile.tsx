@@ -43,7 +43,7 @@ export function Profile() {
       if (process.env.NEXT_PUBLIC_QUEUE_TYPE === "qstash") {
         // wouldn't suggest doing this in production because we leak our key in the browser, but this is a demo
         fetch(
-          `${process.env.NEXT_PUBLIC_QSTASH_URL}/web3-fw-demo.vercel.app/api/qstash/`,
+          `${process.env.NEXT_PUBLIC_QSTASH_URL}web3-fw-demo.vercel.app/api/qstash/`,
           {
             method: "POST",
             headers: {
