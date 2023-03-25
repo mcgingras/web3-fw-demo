@@ -40,9 +40,41 @@ export function Profile() {
 
   useEffect(() => {
     if (data?.hash) {
-      postData("/api/pending-tx", { hash: data?.hash });
+      if (process.env.NEXT_PUBLIC_QUEUE_TYPE === "qstash") {
+        // wouldn't suggest doing this in production because we leak our key in the browser, but this is a demo
+        fetch(
+          `${process.env.NEXT_PUBLIC_QSTASH_URL}/web3-fw-demo.vercel.app/api/qstash/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_QSTASH_TOKEN}`,
+            },
+            body: JSON.stringify({ hash: data?.hash }),
+          }
+        );
+      } else {
+        postData("/api/pending-tx", { hash: data?.hash });
+      }
     }
   }, [data]);
+
+  const publish = () => {
+    if (process.env.NEXT_PUBLIC_QUEUE_TYPE === "qstash") {
+      // wouldn't suggest doing this in production because we leak our key in the browser, but this is a demo
+      fetch(
+        `${process.env.NEXT_PUBLIC_QSTASH_URL}/web3-fw-demo.vercel.app/api/qstash/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_QSTASH_TOKEN}`,
+          },
+          body: JSON.stringify({ hash: data?.hash }),
+        }
+      );
+    }
+  };
 
   if (isConnected) {
     return (
@@ -100,6 +132,7 @@ export function Profile() {
               Send
             </button>
           </form>
+          <button onClick={() => publish()}>test publish</button>
         </div>
       </ClientOnly>
     );
