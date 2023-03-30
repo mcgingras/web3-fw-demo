@@ -10,8 +10,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     receipt = (await publicClient.getTransactionReceipt({
       hash: req.body.hash as `0x${string}`,
     })) as TransactionReceipt;
-
-    console.log(receipt);
   } catch (err) {
     if (err instanceof TransactionReceiptNotFoundError) {
       // 202 seems more appropriate but q-stash only retries if it gets a non 2xx response code

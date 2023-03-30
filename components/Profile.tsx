@@ -12,7 +12,6 @@ import {
 } from "wagmi";
 import { utils } from "ethers";
 import ClientOnly from "@/components/ClientOnly";
-import { postData } from "@/lib/fetch";
 
 export function Profile() {
   const { address, connector, isConnected } = useAccount();
@@ -40,33 +39,6 @@ export function Profile() {
 
   useEffect(() => {
     if (data?.hash) {
-      if (process.env.NEXT_PUBLIC_QUEUE_TYPE === "qstash") {
-        // wouldn't suggest doing this in production because we leak our key in the browser, but this is a demo
-        fetch(
-          `${process.env.NEXT_PUBLIC_QSTASH_URL}https://frog-ff.vercel.app/api/qstash/`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_QSTASH_TOKEN}`,
-            },
-            body: JSON.stringify({
-              hash: data?.hash,
-              endpoint: "/api/tx-receipt",
-            }),
-          }
-        );
-      } else {
-        postData("/api/pending-tx", {
-          hash: data?.hash,
-          endpoint: "/api/tx-receipt",
-        });
-      }
-    }
-  }, [data]);
-
-  const publish = () => {
-    if (process.env.NEXT_PUBLIC_QUEUE_TYPE === "qstash") {
       // wouldn't suggest doing this in production because we leak our key in the browser, but this is a demo
       fetch(
         `${process.env.NEXT_PUBLIC_QSTASH_URL}https://frog-ff.vercel.app/api/qstash/`,
@@ -76,11 +48,14 @@ export function Profile() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_QSTASH_TOKEN}`,
           },
-          body: JSON.stringify({ hash: "data", endpoint: "/api/tx-receipt" }),
+          body: JSON.stringify({
+            hash: data?.hash,
+            endpoint: "/api/tx-receipt",
+          }),
         }
       );
     }
-  };
+  }, [data]);
 
   if (isConnected) {
     return (
@@ -138,7 +113,6 @@ export function Profile() {
               Send
             </button>
           </form>
-          <button onClick={() => publish()}>test publish</button>
         </div>
       </ClientOnly>
     );
