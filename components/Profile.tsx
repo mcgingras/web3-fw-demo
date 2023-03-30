@@ -50,11 +50,17 @@ export function Profile() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${process.env.NEXT_PUBLIC_QSTASH_TOKEN}`,
             },
-            body: JSON.stringify({ hash: data?.hash }),
+            body: JSON.stringify({
+              hash: data?.hash,
+              endpoint: "/api/tx-receipt",
+            }),
           }
         );
       } else {
-        postData("/api/pending-tx", { hash: data?.hash });
+        postData("/api/pending-tx", {
+          hash: data?.hash,
+          endpoint: "/api/tx-receipt",
+        });
       }
     }
   }, [data]);
