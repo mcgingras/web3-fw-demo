@@ -27,10 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (err instanceof TransactionReceiptNotFoundError) {
       // 202 seems more appropriate but q-stash only retries if it gets a non 2xx response code
       console.log("error, probably failed transaction, pending result...");
-      return res.json({
-        statusCode: 500,
-        message: "Transaction not yet confirmed on chain, pending result...",
-      });
+      res.status(500).end();
     }
   }
 }
