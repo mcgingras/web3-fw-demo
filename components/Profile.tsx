@@ -70,7 +70,7 @@ export function Profile() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_QSTASH_TOKEN}`,
           },
-          body: JSON.stringify({ hash: "data" }),
+          body: JSON.stringify({ hash: "data", endpoint: "/api/tx-receipt" }),
         }
       );
     }

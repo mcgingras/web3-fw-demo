@@ -1,12 +1,33 @@
 import { verifySignature } from "@upstash/qstash/nextjs";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { publicClient } from "@/lib/viem";
+import { TransactionReceiptNotFoundError, TransactionReceipt } from "viem";
+import { postData } from "@/lib/fetch";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log(req.body);
-  console.log("If this is printed, the signature has already been verified");
+  try {
+    const receipt = (await publicClient.getTransactionReceipt({
+      hash: req.body.hash as `0x${string}`,
+    })) as TransactionReceipt;
 
-  // do stuff
-  res.status(200).end();
+    const fullEndpoint = `${process.env.API_HOST}${req.body.endpoint}`;
+    await postData(fullEndpoint, {
+      receipt: {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+      },
+    });
+
+    res.status(200).end();
+  } catch (err) {
+    if (err instanceof TransactionReceiptNotFoundError) {
+      // 202 seems more appropriate but q-stash only retries if it gets a non 2xx response code
+      return res.json({
+        statusCode: 500,
+        message: "Transaction not yet confirmed on chain, pending result...",
+      });
+    }
+  }
 }
 
 export default verifySignature(handler);
